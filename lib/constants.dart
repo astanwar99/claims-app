@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:claims_app/components/custom_popup_menu.dart';
 
 const kSendButtonTextStyle = TextStyle(
   color: Colors.lightBlueAccent,
@@ -33,3 +34,8 @@ const kTextFieldDecoration = InputDecoration(
     borderRadius: BorderRadius.all(Radius.circular(32.0)),
   ),
 );
+
+List<CustomPopupMenu> kPopupMenuChoices = <CustomPopupMenu>[
+  CustomPopupMenu(title: 'Settings', icon: Icons.settings),
+  CustomPopupMenu(title: 'Logout', icon: Icons.close),
+];

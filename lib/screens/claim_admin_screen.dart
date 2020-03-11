@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:claims_app/components/custom_popup_menu.dart';
+import 'package:claims_app/constants.dart';
 
 final _firestore = Firestore.instance;
 FirebaseUser loggedInAdmin;
@@ -13,6 +15,7 @@ class ClaimAdminScreen extends StatefulWidget {
 
 class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
   final _auth = FirebaseAuth.instance;
+  List<RequestCard> requestCards = [];
 
   @override
   void initState() {
@@ -31,21 +34,36 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
     }
   }
 
+  void _select(CustomPopupMenu choice) {
+    setState(() {
+      if (choice.title == "Logout") {
+        _auth.signOut();
+        Navigator.pop(context);
+      }
+    });
+  }
+
   Future<List<String>> getUsers() async {
     List<String> usersWithClaims = [];
     final userAdmin = await _firestore.collection('user-admin').getDocuments();
+
+    print(loggedInAdmin.email);
     for (var users in userAdmin.documents) {
+      //check if user is under current admin
       if (loggedInAdmin.email == users.data['admin'] &&
           !usersWithClaims.contains(users.data['user'])) {
+        //add user to user claim list
         usersWithClaims.add(users.data['user']);
+        print(users.data['user']);
+
+        //Initialize Request card for the user
         requestCards.add(new RequestCard(
             client: users.data['user'], titles: [], descriptions: []));
       }
     }
+    print(usersWithClaims);
     return usersWithClaims;
   }
-
-  List<RequestCard> requestCards = [];
 
   Future<String> updateRequestCardList() async {
     List<String> usersWithClaims = await getUsers();
@@ -70,6 +88,19 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("ListView"),
+        actions: <Widget>[
+          PopupMenuButton<CustomPopupMenu>(
+            onSelected: _select,
+            itemBuilder: (BuildContext context) {
+              return kPopupMenuChoices.map((CustomPopupMenu choice) {
+                return PopupMenuItem<CustomPopupMenu>(
+                  value: choice,
+                  child: Text(choice.title),
+                );
+              }).toList();
+            },
+          ),
+        ],
       ),
       body: Container(
         child: FutureBuilder<String>(

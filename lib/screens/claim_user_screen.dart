@@ -1,6 +1,8 @@
+import 'package:claims_app/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:claims_app/components/custom_popup_menu.dart';
 
 final _firestore = Firestore.instance;
 FirebaseUser loggedInUser;
@@ -17,6 +19,10 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
 
   bool registeredAdmin = false;
   String loggedInUserAdmin;
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String title;
+  String description;
 
   @override
   void initState() {
@@ -37,6 +43,7 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
 
   Future<String> getAdmin() async {
     final userAdmin = await _firestore.collection('user-admin').getDocuments();
+    print(loggedInUser.email);
     for (var admins in userAdmin.documents) {
       if (loggedInUser.email == admins.data['user']) {
         loggedInUserAdmin = admins.data['admin'];
@@ -45,6 +52,16 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
       }
     }
     return null;
+  }
+
+  //Popup menu selected choice update
+  void _select(CustomPopupMenu choice) {
+    setState(() {
+      if (choice.title == "Logout") {
+        _auth.signOut();
+        Navigator.pop(context);
+      }
+    });
   }
 
   Widget _buildAdminWarning() {
@@ -122,15 +139,24 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
     );
   }
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String title;
-  String description;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Pending Claims'),
+        actions: <Widget>[
+          PopupMenuButton<CustomPopupMenu>(
+            onSelected: _select,
+            itemBuilder: (BuildContext context) {
+              return kPopupMenuChoices.map((CustomPopupMenu choice) {
+                return PopupMenuItem<CustomPopupMenu>(
+                  value: choice,
+                  child: Text(choice.title),
+                );
+              }).toList();
+            },
+          ),
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -292,54 +318,3 @@ class ClaimRequest extends StatelessWidget {
     );
   }
 }
-//
-//Widget _buildClaimCard(BuildContext context, int index) {
-//  return Container(
-//    padding: EdgeInsets.all(10.0),
-//    height: 100,
-//    decoration: BoxDecoration(
-//      color: Colors.blueGrey,
-//      borderRadius: BorderRadius.circular(10.0),
-//    ),
-//    child: Row(
-//      children: <Widget>[
-//        Expanded(
-//          child: Container(
-//            color: Colors.red,
-//          ),
-//        ),
-//        SizedBox(
-//          width: 10.0,
-//        ),
-//        Expanded(
-//          flex: 3,
-//          child: Column(
-//            crossAxisAlignment: CrossAxisAlignment.start,
-//            children: <Widget>[
-//              Text(
-//                '${titles[index]}',
-//                style: TextStyle(
-//                  fontSize: 20.0,
-//                  fontWeight: FontWeight.bold,
-//                ),
-//              ),
-//              SizedBox(
-//                height: 5.0,
-//              ),
-//              Text('${descriptions[index]}'),
-//            ],
-//          ),
-//        )
-//      ],
-//    ),
-//  );
-//}
-//
-//ListView.separated(
-//padding: const EdgeInsets.all(10.0),
-//itemCount: titles.length,
-//shrinkWrap: true,
-//itemBuilder: _buildClaimCard,
-//separatorBuilder: (BuildContext context, int index) =>
-//const Divider(),
-//),
