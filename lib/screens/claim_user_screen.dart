@@ -3,19 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:claims_app/components/custom_popup_menu.dart';
+import 'package:claims_app/screens/welcome_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:claims_app/auth.dart';
 
 final _firestore = Firestore.instance;
-FirebaseUser loggedInUser;
 
 class ClaimUserScreen extends StatefulWidget {
   static String id = 'claim_user_screen';
+  final FirebaseUser currentUser;
+
+  ClaimUserScreen(this.currentUser);
 
   @override
   _ClaimUserScreenState createState() => _ClaimUserScreenState();
 }
 
 class _ClaimUserScreenState extends State<ClaimUserScreen> {
-  final _auth = FirebaseAuth.instance;
+//  final _auth = FirebaseAuth.instance;
 
   bool registeredAdmin = false;
   String loggedInUserAdmin;
@@ -24,28 +29,11 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
   String title;
   String description;
 
-  @override
-  void initState() {
-    super.initState();
-    getCurrentUser();
-  }
-
-  void getCurrentUser() async {
-    try {
-      final user = await _auth.currentUser();
-      if (user != null) {
-        loggedInUser = user;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
   Future<String> getAdmin() async {
     final userAdmin = await _firestore.collection('user-admin').getDocuments();
-    print(loggedInUser.email);
+    print(widget.currentUser.email);
     for (var admins in userAdmin.documents) {
-      if (loggedInUser.email == admins.data['user']) {
+      if (widget.currentUser.email == admins.data['user']) {
         loggedInUserAdmin = admins.data['admin'];
         registeredAdmin = true;
         break;
@@ -55,13 +43,13 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
   }
 
   //Popup menu selected choice update
-  void _select(CustomPopupMenu choice) {
-    setState(() {
-      if (choice.title == "Logout") {
-        _auth.signOut();
-        Navigator.pop(context);
-      }
-    });
+  void _select(CustomPopupMenu choice) async {
+    if (choice.title == "Logout") {
+      await Provider.of<AuthService>(context, listen: false).logout();
+      setState(() {
+        Navigator.pushReplacementNamed(context, WelcomeScreen.id);
+      });
+    }
   }
 
   Widget _buildAdminWarning() {
@@ -117,7 +105,7 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
                                         _firestore
                                             .collection('user-admin')
                                             .add({
-                                          'user': loggedInUser.email,
+                                          'user': widget.currentUser.email,
                                           'admin': loggedInUserAdmin
                                         });
                                         Navigator.pop(context);
@@ -161,7 +149,7 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
       body: Column(
         children: <Widget>[
           _buildAdminWarning(),
-          MessageStream(),
+          MessageStream(widget.currentUser),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -211,7 +199,7 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
                             _firestore.collection('ClaimRequests').add({
                               'title': title,
                               'description': description,
-                              'user': loggedInUser.email
+                              'user': widget.currentUser.email
                             });
                             Navigator.pop(context);
                           });
@@ -230,22 +218,26 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
 }
 
 class MessageStream extends StatelessWidget {
+  final FirebaseUser currentUser;
+  MessageStream(this.currentUser);
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore.collection('ClaimRequests').snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (!snapshot.hasData || currentUser == null) {
           return Center(
             child: CircularProgressIndicator(
               backgroundColor: Colors.lightBlueAccent,
             ),
           );
         }
-        var claims = snapshot.data.documents.reversed;
+        var claims = snapshot.data.documents;
         List<ClaimRequest> claimRequests = [];
+
         for (var claim in claims) {
-          if (loggedInUser.email == claim.data['user']) {
+          if (currentUser.email == claim.data['user']) {
             final titleText = claim.data['title'];
             final descriptionText = claim.data['description'];
 

@@ -3,12 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:claims_app/components/custom_popup_menu.dart';
 import 'package:claims_app/constants.dart';
+import 'package:claims_app/screens/welcome_screen.dart';
 
 final _firestore = Firestore.instance;
-FirebaseUser loggedInAdmin;
 
 class ClaimAdminScreen extends StatefulWidget {
   static String id = 'claim_admin_screen';
+  final FirebaseUser currentAdmin;
+
+  ClaimAdminScreen(this.currentAdmin);
   @override
   _ClaimAdminScreenState createState() => _ClaimAdminScreenState();
 }
@@ -17,28 +20,11 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
   final _auth = FirebaseAuth.instance;
   List<RequestCard> requestCards = [];
 
-  @override
-  void initState() {
-    super.initState();
-    getCurrentAdmin();
-  }
-
-  void getCurrentAdmin() async {
-    try {
-      final admin = await _auth.currentUser();
-      if (admin != null) {
-        loggedInAdmin = admin;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  void _select(CustomPopupMenu choice) {
+  void _select(CustomPopupMenu choice) async {
     setState(() {
       if (choice.title == "Logout") {
         _auth.signOut();
-        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, WelcomeScreen.id);
       }
     });
   }
@@ -47,10 +33,10 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
     List<String> usersWithClaims = [];
     final userAdmin = await _firestore.collection('user-admin').getDocuments();
 
-    print(loggedInAdmin.email);
+    print(widget.currentAdmin.email);
     for (var users in userAdmin.documents) {
       //check if user is under current admin
-      if (loggedInAdmin.email == users.data['admin'] &&
+      if (widget.currentAdmin.email == users.data['admin'] &&
           !usersWithClaims.contains(users.data['user'])) {
         //add user to user claim list
         usersWithClaims.add(users.data['user']);

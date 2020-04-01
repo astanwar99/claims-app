@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:claims_app/screens/claim_user_screen.dart';
 import 'package:claims_app/constants.dart';
 import 'package:claims_app/components/multi_button.dart';
-import 'package:claims_app/screens/claim_admin_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:claims_app/screens/login_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:claims_app/auth.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static String id = 'registration_screen';
@@ -15,9 +16,9 @@ class RegistrationScreen extends StatefulWidget {
 enum loginType { admin, user }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  final _auth = FirebaseAuth.instance;
-  String email;
-  String password;
+//  final _auth = FirebaseAuth.instance;
+  String _email;
+  String _password;
   bool showSpinner = false;
   loginType _type = loginType.user;
 
@@ -76,7 +77,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     value = 'user.' + value;
                   else
                     value = 'admin.' + value;
-                  email = value;
+                  _email = value;
                 },
                 decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your email.',
@@ -88,7 +89,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               TextField(
                 obscureText: true,
                 onChanged: (value) {
-                  password = value;
+                  _password = value;
                 },
                 decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your password.',
@@ -102,19 +103,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   showSpinner = true;
                 });
                 try {
-                  final newUser = await _auth.createUserWithEmailAndPassword(
-                      email: email, password: password);
+                  FirebaseUser newUser = await Provider.of<AuthService>(context)
+                      .createUser(
+                          firstName: "a",
+                          lastName: "b",
+                          email: _email,
+                          password: _password);
                   if (newUser != null) {
-                    if (_type == loginType.user)
-                      Navigator.pushNamed(
-                        context,
-                        ClaimUserScreen.id,
-                      );
-                    else
-                      Navigator.pushNamed(
-                        context,
-                        ClaimAdminScreen.id,
-                      );
+                    Navigator.pushReplacementNamed(context, LoginScreen.id);
                   }
                   setState(() {
                     showSpinner = false;

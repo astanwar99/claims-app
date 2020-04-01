@@ -5,6 +5,8 @@ import 'package:claims_app/constants.dart';
 import 'package:claims_app/screens/claim_user_screen.dart';
 import 'package:claims_app/screens/claim_admin_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:claims_app/auth.dart';
 
 class LoginScreen extends StatefulWidget {
   static String id = 'login_screen';
@@ -16,11 +18,29 @@ class LoginScreen extends StatefulWidget {
 enum loginType { admin, user }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _auth = FirebaseAuth.instance;
-  String email;
-  String password;
+//  final _auth = FirebaseAuth.instance;
+  String _email;
+  String _password;
   bool showSpinner = false;
   loginType _type = loginType.user;
+
+//  @override
+//  void initState() {
+//    super.initState();
+//    getCurrentUser();
+//  }
+//
+//  void getCurrentUser() async {
+//    try {
+//      final user = await _auth.currentUser();
+//      if (user != null) {
+//        loggedInUser = user;
+//        print(loggedInUser.email);
+//      }
+//    } catch (e) {
+//      print(e);
+//    }
+//  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     value = 'user.' + value;
                   else
                     value = 'admin.' + value;
-                  email = value.trim();
+                  _email = value.trim();
                 },
                 decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your email.',
@@ -89,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 obscureText: true,
                 onChanged: (value) {
-                  password = value;
+                  _password = value;
                 },
                 decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter your password.',
@@ -98,25 +118,15 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 24.0,
               ),
-              MultiButton('Log In', Colors.lightBlueAccent, () {
+              MultiButton('Log In', Colors.lightBlueAccent, () async {
                 setState(() {
                   showSpinner = true;
                 });
                 try {
-                  final user = _auth.signInWithEmailAndPassword(
-                      email: email, password: password);
-                  if (user != null) {
-                    if (_type == loginType.user)
-                      Navigator.pushNamed(
-                        context,
-                        ClaimUserScreen.id,
-                      );
-                    else
-                      Navigator.pushNamed(
-                        context,
-                        ClaimAdminScreen.id,
-                      );
-                  }
+                  FirebaseUser result =
+                      await Provider.of<AuthService>(context, listen: false)
+                          .loginUser(email: _email, password: _password);
+                  print(result);
                   setState(() {
                     showSpinner = false;
                   });
