@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:claims_app/auth.dart';
 
 class LoginScreen extends StatefulWidget {
-  static String id = 'login_screen';
+  static const String id = 'login_screen';
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -18,29 +18,10 @@ class LoginScreen extends StatefulWidget {
 enum loginType { admin, user }
 
 class _LoginScreenState extends State<LoginScreen> {
-//  final _auth = FirebaseAuth.instance;
   String _email;
   String _password;
   bool showSpinner = false;
   loginType _type = loginType.user;
-
-//  @override
-//  void initState() {
-//    super.initState();
-//    getCurrentUser();
-//  }
-//
-//  void getCurrentUser() async {
-//    try {
-//      final user = await _auth.currentUser();
-//      if (user != null) {
-//        loggedInUser = user;
-//        print(loggedInUser.email);
-//      }
-//    } catch (e) {
-//      print(e);
-//    }
-//  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +111,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   setState(() {
                     showSpinner = false;
                   });
+                  if (result != null) {
+                    if (_type == loginType.user)
+                      Navigator.pushReplacementNamed(
+                          context, ClaimUserScreen.id,
+                          arguments: result);
+                    else
+                      Navigator.pushReplacementNamed(
+                          context, ClaimAdminScreen.id,
+                          arguments: result);
+                  }
                 } catch (e) {
                   print(e);
                 }

@@ -4,11 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:claims_app/components/custom_popup_menu.dart';
 import 'package:claims_app/constants.dart';
 import 'package:claims_app/screens/welcome_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:claims_app/auth.dart';
 
 final _firestore = Firestore.instance;
 
 class ClaimAdminScreen extends StatefulWidget {
-  static String id = 'claim_admin_screen';
+  static const String id = 'claim_admin_screen';
   final FirebaseUser currentAdmin;
 
   ClaimAdminScreen(this.currentAdmin);
@@ -21,12 +23,12 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
   List<RequestCard> requestCards = [];
 
   void _select(CustomPopupMenu choice) async {
-    setState(() {
-      if (choice.title == "Logout") {
-        _auth.signOut();
+    if (choice.title == "Logout") {
+      await Provider.of<AuthService>(context, listen: false).logout();
+      setState(() {
         Navigator.pushReplacementNamed(context, WelcomeScreen.id);
-      }
-    });
+      });
+    }
   }
 
   Future<List<String>> getUsers() async {

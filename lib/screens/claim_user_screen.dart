@@ -10,7 +10,7 @@ import 'package:claims_app/auth.dart';
 final _firestore = Firestore.instance;
 
 class ClaimUserScreen extends StatefulWidget {
-  static String id = 'claim_user_screen';
+  static const String id = 'claim_user_screen';
   final FirebaseUser currentUser;
 
   ClaimUserScreen(this.currentUser);

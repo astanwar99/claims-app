@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:claims_app/auth.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  static String id = 'registration_screen';
+  static const String id = 'registration_screen';
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
