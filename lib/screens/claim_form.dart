@@ -90,15 +90,6 @@ class _ClaimFormState extends State<ClaimForm> {
                 decoration: InputDecoration(
                   labelText: 'Date of Bill',
                 ),
-//                validator: (String value) {
-//                  if (value.isEmpty) {
-//                    return 'Description is required';
-//                  }
-//                  return null;
-//                },
-                onSaved: (String value) {
-                  _description = value;
-                },
               ),
               RaisedButton(
                 child: Text("Submit"),
