@@ -1,4 +1,5 @@
 import 'package:claims_app/auth.dart';
+import 'package:claims_app/screens/claim_form.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:claims_app/screens/welcome_screen.dart';
@@ -58,6 +59,8 @@ class Claims extends StatelessWidget {
           case claimUserScreen:
             return MaterialPageRoute(
                 builder: (context) => ClaimUserScreen(data));
+          case claimForm:
+            return MaterialPageRoute(builder: (context) => ClaimForm(data));
           default:
             return MaterialPageRoute(builder: (context) => WelcomeScreen());
         }

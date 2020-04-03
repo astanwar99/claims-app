@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:claims_app/components/custom_popup_menu.dart';
 import 'package:claims_app/screens/welcome_screen.dart';
+import 'package:claims_app/screens/claim_form.dart';
 import 'package:provider/provider.dart';
 import 'package:claims_app/auth.dart';
 
@@ -155,62 +156,8 @@ class _ClaimUserScreenState extends State<ClaimUserScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                content: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      TextFormField(
-                        decoration: InputDecoration(labelText: 'Title'),
-                        validator: (String value) {
-                          if (value.isEmpty) {
-                            return 'Title is required';
-                          }
-                          return null;
-                        },
-                        onSaved: (String value) {
-                          title = value;
-                        },
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(labelText: 'Description'),
-                        validator: (String value) {
-                          if (value.isEmpty) {
-                            return 'Description is required';
-                          }
-                          return null;
-                        },
-                        onSaved: (String value) {
-                          description = value;
-                        },
-                      ),
-                      RaisedButton(
-                        child: Text("Submit"),
-                        onPressed: () {
-                          setState(() {
-                            if (!_formKey.currentState.validate()) {
-                              return;
-                            }
-                            _formKey.currentState.save();
-                            _firestore.collection('ClaimRequests').add({
-                              'title': title,
-                              'description': description,
-                              'user': widget.currentUser.email
-                            });
-                            Navigator.pop(context);
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
+          Navigator.pushNamed(context, ClaimForm.id,
+              arguments: widget.currentUser);
         },
       ),
     );
@@ -310,3 +257,60 @@ class ClaimRequest extends StatelessWidget {
     );
   }
 }
+
+//showDialog(
+//context: context,
+//builder: (BuildContext context) {
+//return AlertDialog(
+//content: Form(
+//key: _formKey,
+//child: Column(
+//mainAxisSize: MainAxisSize.min,
+//children: <Widget>[
+//TextFormField(
+//decoration: InputDecoration(labelText: 'Title'),
+//validator: (String value) {
+//if (value.isEmpty) {
+//return 'Title is required';
+//}
+//return null;
+//},
+//onSaved: (String value) {
+//title = value;
+//},
+//),
+//TextFormField(
+//decoration: InputDecoration(labelText: 'Description'),
+//validator: (String value) {
+//if (value.isEmpty) {
+//return 'Description is required';
+//}
+//return null;
+//},
+//onSaved: (String value) {
+//description = value;
+//},
+//),
+//RaisedButton(
+//child: Text("Submit"),
+//onPressed: () {
+//setState(() {
+//if (!_formKey.currentState.validate()) {
+//return;
+//}
+//_formKey.currentState.save();
+//_firestore.collection('ClaimRequests').add({
+//'title': title,
+//'description': description,
+//'user': widget.currentUser.email
+//});
+//Navigator.pop(context);
+//});
+//},
+//),
+//],
+//),
+//),
+//);
+//},
+//);
