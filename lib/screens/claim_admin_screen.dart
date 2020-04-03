@@ -19,7 +19,6 @@ class ClaimAdminScreen extends StatefulWidget {
 }
 
 class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
-  final _auth = FirebaseAuth.instance;
   List<RequestCard> requestCards = [];
 
   void _select(CustomPopupMenu choice) async {

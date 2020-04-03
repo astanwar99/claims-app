@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 
 final _firestore = Firestore.instance;
 
@@ -17,19 +18,39 @@ class ClaimForm extends StatefulWidget {
 class _ClaimFormState extends State<ClaimForm> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   DateTime _dateTime;
+  String _title;
+  String _description;
+  double _amount;
+  String _category;
+  List<String> _categories = ['Other', 'Accomodation', 'Travel', 'Food'];
+
   String formattedDate;
   TextEditingController dateController;
 
-  String _title;
-  String _description;
   _ClaimFormState() {
     _dateTime = DateTime.now();
+    _category = 'Other';
     updateDate();
   }
 
   void updateDate() {
     formattedDate = "${_dateTime.day}/${_dateTime.month}/${_dateTime.year}";
     dateController = TextEditingController(text: formattedDate);
+  }
+
+  void _submitForm() {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    _formKey.currentState.save();
+    _firestore.collection('ClaimRequests').add({
+      'date': _dateTime,
+      'amount': _amount,
+      'title': _title,
+      'description': _description,
+      'user': widget.currentUser.email
+    });
+    Navigator.pop(context);
   }
 
   @override
@@ -71,6 +92,51 @@ class _ClaimFormState extends State<ClaimForm> {
                   _description = value;
                 },
               ),
+              FormField(
+                builder: (FormFieldState state) {
+                  return InputDecorator(
+                    decoration: InputDecoration(
+                      icon: const Icon(Icons.category),
+                      labelText: 'Category',
+                    ),
+                    child: new DropdownButtonHideUnderline(
+                      child: new DropdownButton(
+                        value: _category,
+                        isDense: true,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            _category = newValue;
+                            state.didChange(newValue);
+                          });
+                        },
+                        items: _categories.map((String value) {
+                          return new DropdownMenuItem(
+                            value: value,
+                            child: new Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  WhitelistingTextInputFormatter.digitsOnly
+                ],
+                decoration: InputDecoration(labelText: 'Amount'),
+                validator: (String value) {
+                  if (value.isEmpty) {
+                    return 'Description is required';
+                  }
+                  return null;
+                },
+                onSaved: (String value) {
+                  _amount = double.parse(value);
+                  print(_amount);
+                },
+              ),
               TextFormField(
                 onTap: () {
                   FocusScope.of(context).requestFocus(new FocusNode());
@@ -93,21 +159,7 @@ class _ClaimFormState extends State<ClaimForm> {
               ),
               RaisedButton(
                 child: Text("Submit"),
-                onPressed: () {
-                  setState(() {
-                    if (!_formKey.currentState.validate()) {
-                      return;
-                    }
-                    _formKey.currentState.save();
-                    _firestore.collection('ClaimRequests').add({
-                      'date': _dateTime,
-                      'title': _title,
-                      'description': _description,
-                      'user': widget.currentUser.email
-                    });
-                    Navigator.pop(context);
-                  });
-                },
+                onPressed: _submitForm,
               ),
             ],
           ),
