@@ -217,6 +217,12 @@ class _ClaimFormState extends State<ClaimForm> {
                 child: Text("Submit"),
                 onPressed: _submitForm,
               ),
+              Visibility(
+                visible: isSavingForm,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
             ],
           ),
         ),
