@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:claims_app/components/custom_popup_menu.dart';
+import 'package:claims_app/components/claim_card.dart';
 import 'package:claims_app/constants.dart';
 import 'package:claims_app/screens/welcome_screen.dart';
 import 'package:provider/provider.dart';
@@ -118,38 +119,11 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
                                   color: Colors.blueGrey,
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Container(
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 10.0,
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            '${requestCards[index].titles[cindex]}',
-                                            style: TextStyle(
-                                              fontSize: 20.0,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5.0,
-                                          ),
-                                          Text(
-                                              '${requestCards[index].descriptions[cindex]}'),
-                                        ],
-                                      ),
-                                    )
-                                  ],
+                                child: ClaimRequest(
+                                  title:
+                                      '${requestCards[index].titles[cindex]}',
+                                  description:
+                                      '${requestCards[index].descriptions[cindex]}',
                                 ),
                               );
                             },

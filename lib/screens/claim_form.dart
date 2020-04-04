@@ -40,6 +40,7 @@ class _ClaimFormState extends State<ClaimForm> {
     _category = 'Other';
     _billExists = false;
     isSavingForm = false;
+    _uploadedFileURL = null;
     updateDate();
   }
 
@@ -76,7 +77,9 @@ class _ClaimFormState extends State<ClaimForm> {
       isSavingForm = true;
     });
     _formKey.currentState.save();
-    await uploadPic(context, _title, _category);
+    if (_image != null) {
+      await uploadPic(context, _title, _category);
+    }
     _firestore.collection('ClaimRequests').add({
       'date': _dateTime,
       'amount': _amount,
