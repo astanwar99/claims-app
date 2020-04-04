@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart' as Path;
 
 final _firestore = Firestore.instance;
 
@@ -22,7 +26,11 @@ class _ClaimFormState extends State<ClaimForm> {
   String _description;
   double _amount;
   String _category;
+  bool _billExists;
+  File _image;
+  String _uploadedFileURL;
   List<String> _categories = ['Other', 'Accomodation', 'Travel', 'Food'];
+  bool isSavingForm;
 
   String formattedDate;
   TextEditingController dateController;
@@ -30,6 +38,8 @@ class _ClaimFormState extends State<ClaimForm> {
   _ClaimFormState() {
     _dateTime = DateTime.now();
     _category = 'Other';
+    _billExists = false;
+    isSavingForm = false;
     updateDate();
   }
 
@@ -38,16 +48,41 @@ class _ClaimFormState extends State<ClaimForm> {
     dateController = TextEditingController(text: formattedDate);
   }
 
-  void _submitForm() {
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      _image = image;
+      print('Image Path $_image');
+    });
+  }
+
+  Future uploadPic(BuildContext context, String title, String category) async {
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child(
+        '${widget.currentUser.email}/${title}_${category}_${Path.basename(_image.path)}.jpg');
+    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
+    await uploadTask.onComplete;
+    _uploadedFileURL = await firebaseStorageRef.getDownloadURL();
+    setState(() {
+      print("Picture uploaded");
+    });
+  }
+
+  void _submitForm() async {
     if (!_formKey.currentState.validate()) {
       return;
     }
+    setState(() {
+      isSavingForm = true;
+    });
     _formKey.currentState.save();
+    await uploadPic(context, _title, _category);
     _firestore.collection('ClaimRequests').add({
       'date': _dateTime,
       'amount': _amount,
       'title': _title,
       'description': _description,
+      'billUrl': _uploadedFileURL,
       'user': widget.currentUser.email
     });
     Navigator.pop(context);
@@ -155,6 +190,27 @@ class _ClaimFormState extends State<ClaimForm> {
                 controller: dateController,
                 decoration: InputDecoration(
                   labelText: 'Date of Bill',
+                ),
+              ),
+              CheckboxListTile(
+                  title: Text('I have bill'),
+                  value: _billExists,
+                  onChanged: (val) {
+                    setState(() => _billExists = val);
+                  }),
+              Visibility(
+                visible: _billExists,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    _image == null
+                        ? Text('Choose image')
+                        : Text('${Path.basename(_image.path)}'),
+                    RaisedButton(
+                      child: Text("Pick Image"),
+                      onPressed: getImage,
+                    ),
+                  ],
                 ),
               ),
               RaisedButton(
