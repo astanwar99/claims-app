@@ -1,3 +1,4 @@
+import 'package:claims_app/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,35 +32,35 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
     }
   }
 
-  Future<List<String>> getUsers() async {
-    List<String> usersWithClaims = [];
+  Future<List<String>> getClients() async {
+    List<String> clientsWithClaims = [];
     final userAdmin = await _firestore.collection('user-admin').getDocuments();
 
     print(widget.currentAdmin.email);
-    for (var users in userAdmin.documents) {
+    for (var client in userAdmin.documents) {
       //check if user is under current admin
-      if (widget.currentAdmin.email == users.data['admin'] &&
-          !usersWithClaims.contains(users.data['user'])) {
+      if (widget.currentAdmin.email == client.data['admin'] &&
+          !clientsWithClaims.contains(client.data['user'])) {
         //add user to user claim list
-        usersWithClaims.add(users.data['user']);
-        print(users.data['user']);
+        clientsWithClaims.add(client.data['user']);
+        print(client.data['user']);
 
         //Initialize Request card for the user
         requestCards.add(new RequestCard(
-            client: users.data['user'], titles: [], descriptions: []));
+            client: client.data['user'], titles: [], descriptions: []));
       }
     }
-    print(usersWithClaims);
-    return usersWithClaims;
+    print(clientsWithClaims);
+    return clientsWithClaims;
   }
 
   Future<String> updateRequestCardList() async {
-    List<String> usersWithClaims = await getUsers();
-    if (usersWithClaims.isEmpty) return null;
+    List<String> clientsWithClaims = await getClients();
+    if (clientsWithClaims.isEmpty) return null;
     final claimRequests =
         await _firestore.collection('ClaimRequests').getDocuments();
     for (var requests in claimRequests.documents) {
-      if (usersWithClaims.contains(requests.data['user'])) {
+      if (clientsWithClaims.contains(requests.data['user'])) {
         for (var card in requestCards) {
           if (card.client == requests.data['user']) {
             card.titles.add(requests.data['title']);
@@ -124,6 +125,8 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
                                       '${requestCards[index].titles[cindex]}',
                                   description:
                                       '${requestCards[index].descriptions[cindex]}',
+                                  screenId: claimRequestDetails,
+                                  client: requestCards[index].client,
                                 ),
                               );
                             },
