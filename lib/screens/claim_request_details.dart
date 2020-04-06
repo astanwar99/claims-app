@@ -6,9 +6,9 @@ final _firestore = Firestore.instance;
 
 class ClaimRequestDetails extends StatefulWidget {
   static const id = 'claim_request_details';
-  final FirebaseUser currentUser;
+  final String client;
 
-  ClaimRequestDetails(this.currentUser);
+  ClaimRequestDetails(this.client);
   @override
   _ClaimRequestDetailsState createState() => _ClaimRequestDetailsState();
 }

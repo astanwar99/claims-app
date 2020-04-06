@@ -1,5 +1,6 @@
 import 'package:claims_app/auth.dart';
 import 'package:claims_app/screens/claim_form.dart';
+import 'package:claims_app/screens/claim_request_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:claims_app/screens/welcome_screen.dart';
@@ -44,7 +45,7 @@ class Claims extends StatelessWidget {
         },
       ),
       onGenerateRoute: (settings) {
-        final FirebaseUser data = settings.arguments;
+        final data = settings.arguments;
         switch (settings.name) {
           case welcomeScreen:
             return MaterialPageRoute(builder: (context) => WelcomeScreen());
@@ -61,6 +62,9 @@ class Claims extends StatelessWidget {
                 builder: (context) => ClaimUserScreen(data));
           case claimForm:
             return MaterialPageRoute(builder: (context) => ClaimForm(data));
+          case claimRequestDetails:
+            return MaterialPageRoute(
+                builder: (context) => ClaimRequestDetails(data));
           default:
             return MaterialPageRoute(builder: (context) => WelcomeScreen());
         }
@@ -80,51 +84,3 @@ class LoadingCircle extends StatelessWidget {
     );
   }
 }
-
-//Future<void> main() async {
-//  WidgetsFlutterBinding.ensureInitialized();
-//  SharedPreferences prefs = await SharedPreferences.getInstance();
-//  var email = prefs.getString('email');
-//  print(email);
-//  if (email == null) {
-//    runApp(Login());
-//  } else {
-//    if (email.split(".")[0] == "admin") {
-//      runApp(Admin());
-//    } else {
-//      runApp(User());
-//    }
-//  }
-//}
-
-//class Login extends StatelessWidget {
-//  @override
-//  Widget build(BuildContext context) {
-//    return MaterialApp(
-//      initialRoute: WelcomeScreen.id,
-//      routes: {
-//        WelcomeScreen.id     : (context) => WelcomeScreen(),
-//        LoginScreen.id       : (context) => LoginScreen(),
-//        RegistrationScreen.id: (context) => RegistrationScreen(),
-//      },
-//    );
-//  }
-//}
-//
-//class User extends StatelessWidget {
-//  @override
-//  Widget build(BuildContext context) {
-//    return MaterialApp(initialRoute: ClaimUserScreen.id, routes: {
-//      ClaimUserScreen.id: (context) => ClaimUserScreen(),
-//    });
-//  }
-//}
-//
-//class Admin extends StatelessWidget {
-//  @override
-//  Widget build(BuildContext context) {
-//    return MaterialApp(
-//        initialRoute: ClaimAdminScreen.id,
-//        routes: {ClaimAdminScreen.id: (context) => ClaimAdminScreen()});
-//  }
-//}
