@@ -1,20 +1,20 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:claims_app/routes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ClaimRequest extends StatelessWidget {
   final String title;
   final String description;
-  final String screenId;
-  final String client;
+  final DocumentSnapshot requestDetails;
 
-  ClaimRequest({this.title, this.description, this.screenId, this.client});
+  ClaimRequest({this.title, this.description, this.requestDetails});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (screenId != null)
-          Navigator.pushNamed(context, screenId, arguments: client);
+        Navigator.pushNamed(context, claimRequestDetails,
+            arguments: requestDetails);
       },
       child: Container(
         padding: EdgeInsets.all(10.0),

@@ -1,5 +1,4 @@
 import 'package:claims_app/constants.dart';
-import 'package:claims_app/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -193,8 +192,7 @@ class MessageStream extends StatelessWidget {
             final claimWidget = ClaimRequest(
               title: titleText,
               description: descriptionText,
-              screenId: claimRequestDetails,
-              client: currentUser.email,
+              requestDetails: claim,
             );
             claimRequests.add(claimWidget);
           }

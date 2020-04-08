@@ -1,4 +1,3 @@
-import 'package:claims_app/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,7 +20,8 @@ class ClaimAdminScreen extends StatefulWidget {
 }
 
 class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
-  List<RequestCard> requestCards = [];
+  List<RequestCard> requestCards;
+  List<DocumentSnapshot> requestDetails;
 
   void _select(CustomPopupMenu choice) async {
     if (choice.title == "Logout") {
@@ -34,6 +34,7 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
 
   Future<List<String>> getClients() async {
     List<String> clientsWithClaims = [];
+    requestCards = [];
     final userAdmin = await _firestore.collection('user-admin').getDocuments();
 
     print(widget.currentAdmin.email);
@@ -56,6 +57,7 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
 
   Future<String> updateRequestCardList() async {
     List<String> clientsWithClaims = await getClients();
+    requestDetails = [];
     if (clientsWithClaims.isEmpty) return null;
     final claimRequests =
         await _firestore.collection('ClaimRequests').getDocuments();
@@ -65,6 +67,7 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
           if (card.client == requests.data['user']) {
             card.titles.add(requests.data['title']);
             card.descriptions.add(requests.data['description']);
+            requestDetails.add(requests);
           }
         }
       }
@@ -125,8 +128,7 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
                                       '${requestCards[index].titles[cindex]}',
                                   description:
                                       '${requestCards[index].descriptions[cindex]}',
-                                  screenId: claimRequestDetails,
-                                  client: requestCards[index].client,
+                                  requestDetails: requestDetails[index],
                                 ),
                               );
                             },
@@ -143,8 +145,8 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
 
 class RequestCard {
   String client;
-  List<String> titles = [];
-  List<String> descriptions = [];
+  List<String> titles;
+  List<String> descriptions;
 
   RequestCard({@required this.client, this.titles, this.descriptions});
 }
