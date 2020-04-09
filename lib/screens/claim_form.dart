@@ -86,7 +86,8 @@ class _ClaimFormState extends State<ClaimForm> {
       'title': _title,
       'description': _description,
       'billUrl': _uploadedFileURL,
-      'user': widget.currentUser.email
+      'user': widget.currentUser.email,
+      'approved': false,
     });
     Navigator.pop(context);
   }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ClaimRequestDetails extends StatefulWidget {
@@ -17,6 +18,8 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
   DateTime _date;
   String _billUrl;
   String _user;
+  bool _approved;
+  String _status;
 
   @override
   void initState() {
@@ -30,29 +33,62 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
     _amount = widget.requestDetails.data['amount'];
     _date = widget.requestDetails.data['date'].toDate();
     _billUrl = widget.requestDetails.data['billUrl'];
-    _user = widget.requestDetails.data['user'];
+    _user = widget.requestDetails.data['user'].split(".")[1];
+    _approved = widget.requestDetails.data['approved'];
+    if (!_approved)
+      _status = "Pending";
+    else
+      _status = "Approved";
+  }
+
+  Text _buildDetail(String text) {
+    return Text(text);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Claims Form'),
+        title: Text('Request Details'),
       ),
       body: SafeArea(
         top: false,
         bottom: false,
-        child: Column(
-          children: <Widget>[
-            Text('User: $_user'),
-            Text('Title: $_title'),
-            Text('Description: $_description'),
-            Text('Date: ${_date.toString()}'),
-            Text('Amount: ${_amount.toString()}'),
-            _billUrl != null
-                ? Image.network(_billUrl)
-                : Text('Bill not available'),
-          ],
+        child: Container(
+          margin: EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _buildDetail('User'),
+                  _buildDetail('Title'),
+                  _buildDetail('Description'),
+                  _buildDetail('Date'),
+                  _buildDetail('Amount'),
+                  _buildDetail('Status'),
+                ],
+              ),
+              SizedBox(
+                width: 50,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _buildDetail(':   $_user'),
+                  _buildDetail(':   $_title'),
+                  _buildDetail(':   $_description'),
+                  _buildDetail(':   ${_date.toString()}'),
+                  _buildDetail(':   ${_amount.toString()}'),
+                  _buildDetail(':   $_status'),
+//                _billUrl != null
+//                    ? Expanded(child: Image.network(_billUrl))
+//                    : Text('Bill not available'),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
