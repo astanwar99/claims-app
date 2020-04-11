@@ -101,7 +101,7 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
                 case ConnectionState.waiting:
-                  return CircularProgressIndicator();
+                  return Center(child: CircularProgressIndicator());
                 default:
                   if (snapshot.hasError)
                     return new Text('Error: ${snapshot.error}');
