@@ -41,12 +41,25 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
       _status = "Approved";
   }
 
-  Text _buildDetail(String text) {
-    return Text(text);
+  Widget _buildDetail(String text) {
+    return Flexible(
+      child: Text(
+        text,
+        style: TextStyle(
+          fontFamily: 'SourceSansPro',
+          fontSize: 25.0,
+//        color: Colors.teal.shade100,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    double fWidth = MediaQuery.of(context).size.width * 0.3;
+    double sWidth = MediaQuery.of(context).size.width * 0.6;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Request Details'),
@@ -59,33 +72,36 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _buildDetail('User'),
-                  _buildDetail('Title'),
-                  _buildDetail('Description'),
-                  _buildDetail('Date'),
-                  _buildDetail('Amount'),
-                  _buildDetail('Status'),
-                ],
+              Container(
+                width: fWidth,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _buildDetail('User'),
+                    _buildDetail('Title'),
+                    _buildDetail('Description'),
+                    _buildDetail('Date'),
+                    _buildDetail('Amount'),
+                    _buildDetail('Status'),
+                  ],
+                ),
               ),
-              SizedBox(
-                width: 50,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _buildDetail(':   $_user'),
-                  _buildDetail(':   $_title'),
-                  _buildDetail(':   $_description'),
-                  _buildDetail(':   ${_date.toString()}'),
-                  _buildDetail(':   ${_amount.toString()}'),
-                  _buildDetail(':   $_status'),
-//                _billUrl != null
-//                    ? Expanded(child: Image.network(_billUrl))
-//                    : Text('Bill not available'),
-                ],
+              Container(
+                width: sWidth,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _buildDetail(':   $_user'),
+                    _buildDetail(':   $_title'),
+                    _buildDetail(':   $_description'),
+                    _buildDetail(':   ${_date.toString()}'),
+                    _buildDetail(':   ${_amount.toString()}'),
+                    _buildDetail(':   $_status'),
+//                    _billUrl != null
+//                        ? Expanded(child: Image.network(_billUrl))
+//                        : Text('Bill not available'),
+                  ],
+                ),
               ),
             ],
           ),
