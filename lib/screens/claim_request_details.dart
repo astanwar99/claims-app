@@ -23,8 +23,6 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
   bool _approved;
   String _status;
   String _attachmentSubtitle;
-  Future<void> _launchedBill;
-  Future<void> _launchedSheet;
 
   @override
   void initState() {
@@ -101,7 +99,7 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
                 RaisedButton(
                   onPressed: () => setState(() {
                     _billUrl != null
-                        ? _launchedBill = _launchURL(_billUrl)
+                        ? _launchURL(_billUrl)
                         : Scaffold.of(context).showSnackBar(SnackBar(
                             content: Text('Bill not uploaded'),
                           ));
@@ -111,7 +109,7 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
                 RaisedButton(
                   onPressed: () => setState(() {
                     _sheetUrl != null
-                        ? _launchedSheet = _launchURL(_sheetUrl)
+                        ? _launchURL(_sheetUrl)
                         : Scaffold.of(context).showSnackBar(SnackBar(
                             content: Text('Sheet not uploaded'),
                           ));
