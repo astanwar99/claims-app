@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ClaimRequestDetails extends StatefulWidget {
   static const id = 'claim_request_details';
@@ -17,9 +18,12 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
   double _amount;
   DateTime _date;
   String _billUrl;
+  String _sheetUrl;
   String _user;
   bool _approved;
   String _status;
+  Future<void> _launchedBill;
+  Future<void> _launchedSheet;
 
   @override
   void initState() {
@@ -33,6 +37,7 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
     _amount = widget.requestDetails.data['amount'];
     _date = widget.requestDetails.data['date'].toDate();
     _billUrl = widget.requestDetails.data['billUrl'];
+    _sheetUrl = widget.requestDetails.data['sheetUrl'];
     _user = widget.requestDetails.data['user'].split(".")[1];
     _approved = widget.requestDetails.data['approved'];
     if (!_approved)
@@ -53,6 +58,18 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
         ),
       ),
     );
+  }
+
+  Future<void> _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -97,9 +114,23 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
                     _buildDetail(':   ${_date.toString()}'),
                     _buildDetail(':   ${_amount.toString()}'),
                     _buildDetail(':   $_status'),
-//                    _billUrl != null
+                    _billUrl != null
+                        ? RaisedButton(
+                            onPressed: () => setState(() {
+                              _launchedBill = _launchURL(_billUrl);
+                            }),
+                            child: new Text('Load Bill'),
+                          )
 //                        ? Expanded(child: Image.network(_billUrl))
-//                        : Text('Bill not available'),
+                        : Text('Bill not available'),
+                    _sheetUrl != null
+                        ? RaisedButton(
+                            onPressed: () => setState(() {
+                              _launchedSheet = _launchURL(_sheetUrl);
+                            }),
+                            child: new Text('Load Sheet'),
+                          )
+                        : Text('Sheet not available'),
                   ],
                 ),
               ),

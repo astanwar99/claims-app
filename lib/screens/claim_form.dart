@@ -29,6 +29,8 @@ class _ClaimFormState extends State<ClaimForm> {
   bool _billExists;
   File _image;
   String _uploadedFileURL;
+  bool _sheetExists;
+  String _spreadsheetUrl;
   List<String> _categories = ['Other', 'Accomodation', 'Travel', 'Food'];
   bool isSavingForm;
 
@@ -41,6 +43,8 @@ class _ClaimFormState extends State<ClaimForm> {
     _billExists = false;
     isSavingForm = false;
     _uploadedFileURL = null;
+    _sheetExists = false;
+    _spreadsheetUrl = null;
     updateDate();
   }
 
@@ -86,6 +90,7 @@ class _ClaimFormState extends State<ClaimForm> {
       'title': _title,
       'description': _description,
       'billUrl': _uploadedFileURL,
+      'sheetUrl': _spreadsheetUrl,
       'user': widget.currentUser.email,
       'approved': false,
     });
@@ -215,6 +220,21 @@ class _ClaimFormState extends State<ClaimForm> {
                       onPressed: getImage,
                     ),
                   ],
+                ),
+              ),
+              CheckboxListTile(
+                  title: Text('I have spread sheet'),
+                  value: _sheetExists,
+                  onChanged: (val) {
+                    setState(() => _sheetExists = val);
+                  }),
+              Visibility(
+                visible: _sheetExists,
+                child: TextFormField(
+                  decoration: InputDecoration(labelText: 'Sheet Link'),
+                  onSaved: (String value) {
+                    _spreadsheetUrl = value;
+                  },
                 ),
               ),
               RaisedButton(

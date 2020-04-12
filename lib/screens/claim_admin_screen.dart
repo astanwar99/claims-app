@@ -21,7 +21,7 @@ class ClaimAdminScreen extends StatefulWidget {
 
 class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
   List<RequestCard> requestCards;
-  List<DocumentSnapshot> requestDetails;
+  List<RequestDetails> requestDetails;
 
   void _select(CustomPopupMenu choice) async {
     if (choice.title == "Logout") {
@@ -35,6 +35,7 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
   Future<List<String>> getClients() async {
     List<String> clientsWithClaims = [];
     requestCards = [];
+    requestDetails = [];
     final userAdmin = await _firestore.collection('user-admin').getDocuments();
 
     print(widget.currentAdmin.email);
@@ -44,34 +45,41 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
           !clientsWithClaims.contains(client.data['user'])) {
         //add user to user claim list
         clientsWithClaims.add(client.data['user']);
-        print(client.data['user']);
 
         //Initialize Request card for the user
         requestCards.add(new RequestCard(
             client: client.data['user'], titles: [], descriptions: []));
+        requestDetails
+            .add(new RequestDetails(client: client.data['user'], requests: []));
       }
     }
-    print(clientsWithClaims);
     return clientsWithClaims;
   }
 
   Future<String> updateRequestCardList() async {
     List<String> clientsWithClaims = await getClients();
-    requestDetails = [];
     if (clientsWithClaims.isEmpty) return null;
     final claimRequests =
         await _firestore.collection('ClaimRequests').getDocuments();
     for (var requests in claimRequests.documents) {
       if (clientsWithClaims.contains(requests.data['user'])) {
-        for (var card in requestCards) {
-          if (card.client == requests.data['user']) {
-            card.titles.add(requests.data['title']);
-            card.descriptions.add(requests.data['description']);
-            requestDetails.add(requests);
+//        for (var card in requestCards) {
+//          if (card.client == requests.data['user']) {
+//            card.titles.add(requests.data['title']);
+//            card.descriptions.add(requests.data['description']);
+//          }
+//        }
+        for (int i = 0; i < requestCards.length; i++) {
+          if (requestCards[i].client == requests.data['user']) {
+            requestCards[i].titles.add(requests.data['title']);
+            requestCards[i].descriptions.add(requests.data['description']);
+            requestDetails[i].requests.add(requests);
           }
         }
       }
     }
+    print(requestDetails.length);
+    print(requestCards[1].titles.length);
     return null;
   }
 
@@ -128,7 +136,8 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
                                       '${requestCards[index].titles[cindex]}',
                                   description:
                                       '${requestCards[index].descriptions[cindex]}',
-                                  requestDetails: requestDetails[index],
+                                  requestDetails:
+                                      requestDetails[index].requests[cindex],
                                 ),
                               );
                             },
@@ -149,4 +158,11 @@ class RequestCard {
   List<String> descriptions;
 
   RequestCard({@required this.client, this.titles, this.descriptions});
+}
+
+class RequestDetails {
+  String client;
+  List<DocumentSnapshot> requests;
+
+  RequestDetails({this.client, this.requests});
 }
