@@ -22,6 +22,7 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
   String _user;
   bool _approved;
   String _status;
+  String _attachmentSubtitle;
   Future<void> _launchedBill;
   Future<void> _launchedSheet;
 
@@ -40,21 +41,86 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
     _sheetUrl = widget.requestDetails.data['sheetUrl'];
     _user = widget.requestDetails.data['user'].split(".")[1];
     _approved = widget.requestDetails.data['approved'];
+    _attachmentSubtitle = "Download for more details";
     if (!_approved)
       _status = "Pending";
     else
       _status = "Approved";
   }
 
-  Widget _buildDetail(String text) {
-    return Flexible(
-      child: Text(
-        text,
-        style: TextStyle(
-          fontFamily: 'SourceSansPro',
-          fontSize: 25.0,
-//        color: Colors.teal.shade100,
-          letterSpacing: 1.2,
+  Widget _buildDetail(String head, String body) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 5),
+      elevation: 5,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              head,
+              style: TextStyle(
+                fontFamily: 'SourceSansPro',
+                fontSize: 17.0,
+                letterSpacing: 1.2,
+              ),
+            ),
+            Text(
+              body,
+              style: TextStyle(
+                fontFamily: 'SourceSansPro',
+                fontSize: 22.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAttachments() {
+    return Builder(
+      builder: (context) => Card(
+        elevation: 5,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            ListTile(
+              title: Text(
+                'Attachments',
+                style: TextStyle(
+                  fontFamily: 'SourceSansPro',
+                  fontSize: 17.0,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              subtitle: Text(_attachmentSubtitle),
+            ),
+            ButtonBar(
+              children: <Widget>[
+                RaisedButton(
+                  onPressed: () => setState(() {
+                    _billUrl != null
+                        ? _launchedBill = _launchURL(_billUrl)
+                        : Scaffold.of(context).showSnackBar(SnackBar(
+                            content: Text('Bill not uploaded'),
+                          ));
+                  }),
+                  child: new Text('Load Bill'),
+                ),
+                RaisedButton(
+                  onPressed: () => setState(() {
+                    _sheetUrl != null
+                        ? _launchedSheet = _launchURL(_sheetUrl)
+                        : Scaffold.of(context).showSnackBar(SnackBar(
+                            content: Text('Sheet not uploaded'),
+                          ));
+                  }),
+                  child: new Text('Load Sheet'),
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );
@@ -74,9 +140,6 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
 
   @override
   Widget build(BuildContext context) {
-    double fWidth = MediaQuery.of(context).size.width * 0.3;
-    double sWidth = MediaQuery.of(context).size.width * 0.6;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Request Details'),
@@ -85,56 +148,20 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
         top: false,
         bottom: false,
         child: Container(
-          margin: EdgeInsets.all(10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                width: fWidth,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    _buildDetail('User'),
-                    _buildDetail('Title'),
-                    _buildDetail('Description'),
-                    _buildDetail('Date'),
-                    _buildDetail('Amount'),
-                    _buildDetail('Status'),
-                  ],
-                ),
-              ),
-              Container(
-                width: sWidth,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    _buildDetail(':   $_user'),
-                    _buildDetail(':   $_title'),
-                    _buildDetail(':   $_description'),
-                    _buildDetail(':   ${_date.toString()}'),
-                    _buildDetail(':   ${_amount.toString()}'),
-                    _buildDetail(':   $_status'),
-                    _billUrl != null
-                        ? RaisedButton(
-                            onPressed: () => setState(() {
-                              _launchedBill = _launchURL(_billUrl);
-                            }),
-                            child: new Text('Load Bill'),
-                          )
-//                        ? Expanded(child: Image.network(_billUrl))
-                        : Text('Bill not available'),
-                    _sheetUrl != null
-                        ? RaisedButton(
-                            onPressed: () => setState(() {
-                              _launchedSheet = _launchURL(_sheetUrl);
-                            }),
-                            child: new Text('Load Sheet'),
-                          )
-                        : Text('Sheet not available'),
-                  ],
-                ),
-              ),
-            ],
+          margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _buildDetail('User', _user),
+                _buildDetail('Title', _title),
+                _buildDetail('Description', _description),
+                _buildDetail('Date', _date.toString()),
+                _buildDetail('Amount', _amount.toString()),
+                _buildDetail('Status', _status),
+                _buildAttachments(),
+              ],
+            ),
           ),
         ),
       ),
