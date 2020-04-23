@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -63,12 +64,6 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
         await _firestore.collection('ClaimRequests').getDocuments();
     for (var requests in claimRequests.documents) {
       if (clientsWithClaims.contains(requests.data['user'])) {
-//        for (var card in requestCards) {
-//          if (card.client == requests.data['user']) {
-//            card.titles.add(requests.data['title']);
-//            card.descriptions.add(requests.data['description']);
-//          }
-//        }
         for (int i = 0; i < requestCards.length; i++) {
           if (requestCards[i].client == requests.data['user']) {
             requestCards[i].titles.add(requests.data['title']);
@@ -78,8 +73,6 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
         }
       }
     }
-    print(requestDetails.length);
-    print(requestCards[1].titles.length);
     return null;
   }
 
@@ -104,49 +97,61 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
       ),
       body: Container(
         child: FutureBuilder<String>(
-            future: updateRequestCardList(), // a Future<String> or null
-            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                  return Center(child: CircularProgressIndicator());
-                default:
-                  if (snapshot.hasError)
-                    return new Text('Error: ${snapshot.error}');
-                  else
-                    return ListView.separated(
-                        padding: const EdgeInsets.all(10.0),
-                        itemCount: requestCards.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListView.builder(
-                            padding: const EdgeInsets.all(10.0),
-                            itemCount: requestCards[index].titles.length,
-                            shrinkWrap: true,
-                            physics: ClampingScrollPhysics(),
-                            itemBuilder: (BuildContext context, int cindex) {
-                              return Container(
-                                padding: EdgeInsets.all(10.0),
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.blueGrey,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                child: ClaimRequest(
-                                  title:
-                                      '${requestCards[index].titles[cindex]}',
-                                  description:
-                                      '${requestCards[index].descriptions[cindex]}',
-                                  requestDetails:
-                                      requestDetails[index].requests[cindex],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        separatorBuilder: (BuildContext context, int index) =>
-                            const Divider());
-              }
-            }),
+          future: updateRequestCardList(), // a Future<String> or null
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+              default:
+                if (snapshot.hasError)
+                  return new Text('Error: ${snapshot.error}');
+                else
+                  return ListView.separated(
+                    itemCount: requestCards.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text('${requestCards[index].client.substring(5)}'),
+                            ListView.separated(
+                              itemCount: requestCards[index].titles.length,
+                              shrinkWrap: true,
+                              physics: ClampingScrollPhysics(),
+                              itemBuilder: (BuildContext context, int cindex) {
+                                return Container(
+                                  padding: EdgeInsets.all(10.0),
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueGrey,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  child: ClaimRequest(
+                                    title:
+                                        '${requestCards[index].titles[cindex]}',
+                                    description:
+                                        '${requestCards[index].descriptions[cindex]}',
+                                    requestDetails:
+                                        requestDetails[index].requests[cindex],
+                                  ),
+                                );
+                              },
+                              separatorBuilder:
+                                  (BuildContext context, int index) =>
+                                      SizedBox(height: 5),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) =>
+                        SizedBox(height: 15),
+                  );
+            }
+          },
+        ),
       ),
     );
   }
