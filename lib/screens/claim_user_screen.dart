@@ -199,9 +199,11 @@ class MessageStream extends StatelessWidget {
         }
 
         return Expanded(
-          child: ListView(
-            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-            children: claimRequests,
+          child: ListView.separated(
+            itemBuilder: (context, index) => claimRequests[index],
+            itemCount: claimRequests.length,
+            padding: EdgeInsets.all(10.0),
+            separatorBuilder: (context, index) => SizedBox(height: 10),
           ),
         );
       },
