@@ -1,18 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ClaimRequestDetails extends StatefulWidget {
   static const id = 'claim_request_details';
-  final DocumentSnapshot requestDetails;
-
-  ClaimRequestDetails(this.requestDetails);
+  final List receivedData;
+  ClaimRequestDetails(this.receivedData);
   @override
-  _ClaimRequestDetailsState createState() => _ClaimRequestDetailsState();
+  _ClaimRequestDetailsState createState() =>
+      _ClaimRequestDetailsState(receivedData);
 }
 
 class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
+  DocumentSnapshot requestDetails;
+  FirebaseUser currentUser;
+
+  _ClaimRequestDetailsState(List data) {
+    requestDetails = data[0];
+    currentUser = data[1];
+  }
+
   String _title;
   String _description;
   double _amount;
@@ -31,14 +40,14 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
   }
 
   void getDetails() {
-    _title = widget.requestDetails.data['title'];
-    _description = widget.requestDetails.data['description'];
-    _amount = widget.requestDetails.data['amount'];
-    _date = widget.requestDetails.data['date'].toDate();
-    _billUrl = widget.requestDetails.data['billUrl'];
-    _sheetUrl = widget.requestDetails.data['sheetUrl'];
-    _user = widget.requestDetails.data['user'].split(".")[1];
-    _approved = widget.requestDetails.data['approved'];
+    _title = requestDetails.data['title'];
+    _description = requestDetails.data['description'];
+    _amount = requestDetails.data['amount'];
+    _date = requestDetails.data['date'].toDate();
+    _billUrl = requestDetails.data['billUrl'];
+    _sheetUrl = requestDetails.data['sheetUrl'];
+    _user = requestDetails.data['user'].split(".")[1];
+    _approved = requestDetails.data['approved'];
     _attachmentSubtitle = "Download for more details";
     if (!_approved)
       _status = "Pending";
