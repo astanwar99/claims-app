@@ -121,6 +121,10 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
                               shrinkWrap: true,
                               physics: ClampingScrollPhysics(),
                               itemBuilder: (BuildContext context, int cindex) {
+                                List args = [
+                                  requestDetails[index].requests[cindex],
+                                  widget.currentAdmin
+                                ];
                                 return Container(
                                   padding: EdgeInsets.all(10.0),
                                   height: 100,
@@ -133,8 +137,7 @@ class _ClaimAdminScreenState extends State<ClaimAdminScreen> {
                                         '${requestCards[index].titles[cindex]}',
                                     description:
                                         '${requestCards[index].descriptions[cindex]}',
-                                    requestDetails:
-                                        requestDetails[index].requests[cindex],
+                                    arguments: args,
                                   ),
                                 );
                               },

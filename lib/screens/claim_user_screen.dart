@@ -192,7 +192,7 @@ class MessageStream extends StatelessWidget {
             final claimWidget = ClaimRequest(
               title: titleText,
               description: descriptionText,
-              requestDetails: claim,
+              arguments: [claim, currentUser],
             );
             claimRequests.add(claimWidget);
           }
