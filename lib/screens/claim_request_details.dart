@@ -16,6 +16,7 @@ class ClaimRequestDetails extends StatefulWidget {
 class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
   DocumentSnapshot requestDetails;
   FirebaseUser currentUser;
+  bool approveButtonVisible = false;
 
   _ClaimRequestDetailsState(List data) {
     requestDetails = data[0];
@@ -53,6 +54,9 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
       _status = "Pending";
     else
       _status = "Approved";
+
+    if (currentUser.email.substring(0, 5) == 'admin')
+      approveButtonVisible = true;
   }
 
   Widget _buildDetail(String head, String body) {
@@ -77,6 +81,59 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
               style: TextStyle(
                 fontFamily: 'SourceSansPro',
                 fontSize: 22.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatus(String body) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 5),
+      elevation: 5,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "Status",
+                  style: TextStyle(
+                    fontFamily: 'SourceSansPro',
+                    fontSize: 17.0,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                Text(
+                  body,
+                  style: TextStyle(
+                    fontFamily: 'SourceSansPro',
+                    fontSize: 22.0,
+                  ),
+                ),
+              ],
+            ),
+            Visibility(
+              visible: approveButtonVisible,
+              child: FlatButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                padding: EdgeInsets.all(8.0),
+                splashColor: Colors.blueAccent,
+                onPressed: () {},
+                child: Text(
+                  "Approve",
+                  style: TextStyle(
+                    fontFamily: 'SourceSansPro',
+                    fontSize: 17.0,
+                    letterSpacing: 1.2,
+                  ),
+                ),
               ),
             ),
           ],
@@ -165,7 +222,7 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
                 _buildDetail('Description', _description),
                 _buildDetail('Date', _date.toString()),
                 _buildDetail('Amount', _amount.toString()),
-                _buildDetail('Status', _status),
+                _buildStatus(_status),
                 _buildAttachments(),
               ],
             ),
