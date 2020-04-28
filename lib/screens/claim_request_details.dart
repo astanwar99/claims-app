@@ -36,11 +36,6 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
   String _status;
   String _attachmentSubtitle;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   void getDetails() {
     _title = requestDetails.data['title'];
     _description = requestDetails.data['description'];
