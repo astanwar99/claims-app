@@ -48,7 +48,7 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
     _date = requestDetails.data['date'].toDate();
     _billUrl = requestDetails.data['billUrl'];
     _sheetUrl = requestDetails.data['sheetUrl'];
-    _user = requestDetails.data['user'].split(".")[1];
+    _user = requestDetails.data['user'].substring(5);
     _approved = requestDetails.data['approved'];
     _attachmentSubtitle = "Download for more details";
     if (!_approved)
@@ -262,7 +262,8 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
                 _buildDetail('User', _user),
                 _buildDetail('Title', _title),
                 _buildDetail('Description', _description),
-                _buildDetail('Date', _date.toString()),
+                _buildDetail(
+                    'Date', "${_date.day}/${_date.month}/${_date.year}"),
                 _buildDetail('Amount', _amount.toString()),
                 _buildStatus(_status),
                 _buildAttachments(),
