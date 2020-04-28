@@ -37,7 +37,6 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
   @override
   void initState() {
     super.initState();
-    getDetails();
   }
 
   void getDetails() {
@@ -55,8 +54,39 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
     else
       _status = "Approved";
 
-    if (currentUser.email.substring(0, 5) == 'admin')
+    if (currentUser.email.substring(0, 5) == 'admin' && !_approved)
       approveButtonVisible = true;
+  }
+
+  Future<void> _approveConfirmation() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm choice'),
+          content: SingleChildScrollView(
+              child: Text("Are you sure you want to confirm the request?")),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Confirm'),
+              onPressed: () {
+                setState(() {
+                  _approved = true;
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildDetail(String head, String body) {
@@ -125,7 +155,9 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
                 textColor: Colors.white,
                 padding: EdgeInsets.all(8.0),
                 splashColor: Colors.blueAccent,
-                onPressed: () {},
+                onPressed: () async {
+                  await _approveConfirmation();
+                },
                 child: Text(
                   "Approve",
                   style: TextStyle(
@@ -204,6 +236,7 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
 
   @override
   Widget build(BuildContext context) {
+    getDetails();
     return Scaffold(
       appBar: AppBar(
         title: Text('Request Details'),
