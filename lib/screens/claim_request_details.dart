@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+final _firestore = Firestore.instance;
+
 class ClaimRequestDetails extends StatefulWidget {
   static const id = 'claim_request_details';
   final List receivedData;
@@ -72,6 +74,10 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
               child: Text('Confirm'),
               onPressed: () {
                 setState(() {
+                  _firestore
+                      .collection('ClaimRequests')
+                      .document(requestDetails.documentID)
+                      .updateData({'approved': true});
                   _approved = true;
                 });
                 Navigator.of(context).pop();
@@ -157,6 +163,9 @@ class _ClaimRequestDetailsState extends State<ClaimRequestDetails> {
                 splashColor: Colors.blueAccent,
                 onPressed: () async {
                   await _approveConfirmation();
+                  if (_approved) {
+                    Navigator.pop(context);
+                  }
                 },
                 child: Text(
                   "Approve",
